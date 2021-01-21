@@ -12,7 +12,8 @@ y = dataset['Doses']
 
 mymodel = np.poly1d(np.polyfit(x, y, 2))
 
-until = datetime.strptime('2021-03-01', '%Y-%m-%d')
+# show graph up to:
+until = datetime.strptime('2021-03-05', '%Y-%m-%d')
 myline = np.linspace(mdates.date2num(dataset.Date[0]), mdates.date2num(until))
 
 dayloc = mdates.DayLocator()
@@ -29,7 +30,8 @@ ax.grid(True)
 ax.grid(b=True, which="minor")
 
 plt.plot(dataset.Date, y, label="Doses per 100", color="tab:green")
-plt.plot(myline, mymodel(myline), label="Estimate (polynomial regression)", linestyle=":", color="tab:orange")
+plt.plot(myline, mymodel(myline), label="Estimate (polynomial regression)",
+         linestyle=":", color="tab:orange")
 plt.ylabel('Doses')
 plt.xlabel('Date')
 plt.title('COVID-19 Vaccine Doses per 100')
@@ -38,6 +40,6 @@ plt.legend()
 ax.tick_params(axis='x', which='both', labelsize=5)
 plt.savefig('chart.svg')
 
-d = datetime.strptime('2021-02-26', '%Y-%m-%d')
+d = datetime.strptime('2021-03-02', '%Y-%m-%d')
 print("Doses will be: " + str(mymodel(mdates.date2num(d))))
 print(mymodel(120))
