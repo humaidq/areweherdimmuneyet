@@ -40,6 +40,6 @@ plt.legend()
 ax.tick_params(axis='x', which='both', labelsize=5)
 plt.savefig('chart.svg')
 
-d = datetime.strptime('2021-04-04', '%Y-%m-%d')
+d = datetime.strptime('2021-04-11', '%Y-%m-%d')
 print("Doses will be: " + str(mymodel(mdates.date2num(d))))
 print(mymodel(120))
