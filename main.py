@@ -37,6 +37,9 @@ plt.xlabel('Date')
 plt.title('COVID-19 Vaccine Doses per 100')
 plt.legend()
 
+# horizontal line
+plt.axhline(y = 120, color = 'r', linestyle = ':')
+
 ax.tick_params(axis='x', which='both', labelsize=5)
 plt.savefig('chart.svg')
 
