@@ -13,7 +13,7 @@ y = dataset['Doses']
 mymodel = np.poly1d(np.polyfit(x, y, 2))
 
 # show graph up to:
-until = datetime.strptime('2021-04-06', '%Y-%m-%d')
+until = datetime.strptime('2021-04-04', '%Y-%m-%d')
 myline = np.linspace(mdates.date2num(dataset.Date[0]), mdates.date2num(until))
 
 dayloc = mdates.DayLocator()
@@ -43,6 +43,6 @@ plt.axhline(y = 120, color = 'r', linestyle = ':')
 ax.tick_params(axis='x', which='both', labelsize=5)
 plt.savefig('chart.svg')
 
-d = datetime.strptime('2021-03-30', '%Y-%m-%d')
+d = datetime.strptime('2021-03-28', '%Y-%m-%d')
 print("Doses will be: " + str(mymodel(mdates.date2num(d))))
 print(mymodel(120))
