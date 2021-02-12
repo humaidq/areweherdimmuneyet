@@ -2,7 +2,12 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-from datetime import datetime
+import sys
+from datetime import date, timedelta
+import requests
+
+# Doses goal for calculations
+DOSES_GOAL = 140
 
 dataset = pd.read_csv('data.csv')
 dataset['Date'] = pd.to_datetime(dataset['Date'])
@@ -10,39 +15,86 @@ dataset['Date'] = pd.to_datetime(dataset['Date'])
 x = mdates.date2num(pd.Index(dataset.Date).to_pydatetime())
 y = dataset['Doses']
 
-mymodel = np.poly1d(np.polyfit(x, y, 2))
 
-# show graph up to:
-until = datetime.strptime('2021-03-29', '%Y-%m-%d')
-myline = np.linspace(mdates.date2num(dataset.Date[0]), mdates.date2num(until))
+def get_herd_immunity():
+    model = np.poly1d(np.polyfit(x, y, 2))
+    x0 = (model - DOSES_GOAL).roots
+    return (model, mdates.num2date(x0[0]))
 
-dayloc = mdates.DayLocator()
-fdloc = mdates.DayLocator(interval=5)
-fig, ax = plt.subplots()
-maj_fmt = mdates.DateFormatter('%-d %b')
-min_fmt = mdates.DateFormatter('%-d')
-ax.xaxis.set_major_formatter(maj_fmt)
-#ax.xaxis.set_minor_formatter(min_fmt)
-ax.xaxis.set_major_locator(fdloc)
-ax.xaxis.set_minor_locator(dayloc)
-fig.autofmt_xdate()
-ax.grid(True)
-ax.grid(b=True, which="minor")
 
-plt.plot(dataset.Date, y, label="Doses per 100", color="tab:green")
-plt.plot(myline, mymodel(myline), label="Estimate (polynomial regression)",
-         linestyle=":", color="tab:orange")
-plt.ylabel('Doses')
-plt.xlabel('Date')
-plt.title('COVID-19 Vaccine Doses per 100')
-plt.legend()
+def gen_img():
+    model, estimate = get_herd_immunity()
 
-# horizontal line
-plt.axhline(y = 120, color = 'r', linestyle = ':')
+    # show graph up to:
+    until = estimate + timedelta(days=3)
+    myline = np.linspace(mdates.date2num(dataset.Date[0]),
+                         mdates.date2num(until))
 
-ax.tick_params(axis='x', which='both', labelsize=5)
-plt.savefig('chart.svg')
+    dayloc = mdates.DayLocator()
+    fdloc = mdates.DayLocator(interval=5)
+    fig, ax = plt.subplots()
+    maj_fmt = mdates.DateFormatter('%-d %b')
+    ax.xaxis.set_major_formatter(maj_fmt)
+    ax.xaxis.set_major_locator(fdloc)
+    ax.xaxis.set_minor_locator(dayloc)
+    fig.autofmt_xdate()
+    ax.grid(True)
+    ax.grid(b=True, which="minor")
 
-d = datetime.strptime('2021-03-22', '%Y-%m-%d')
-print("Doses will be: " + str(mymodel(mdates.date2num(d))))
-print(mymodel(120))
+    plt.plot(dataset.Date, y, label="Doses per 100", color="tab:green")
+    plt.plot(myline, model(myline), label="Estimate (polynomial regression)",
+             linestyle=":", color="tab:orange")
+    plt.ylabel('Doses')
+    plt.xlabel('Date')
+    plt.title('COVID-19 Vaccine Doses per 100')
+    plt.legend()
+
+    # horizontal line
+    plt.axhline(y=DOSES_GOAL, color='r', linestyle=':')
+
+    ax.tick_params(axis='x', which='both', labelsize=5)
+    plt.savefig('chart.svg')
+
+    print("We will reach herd immunity at: " +
+          estimate.strftime("%Y-%m-%d"))
+
+
+def pull_data():
+    api = "http://covid19.ncema.gov.ae/ar/Home/InitializeDosesLineChart"
+    params = dict(
+            Year=0,
+            Month=0,
+            Type="LatestTenDays",
+            screenWidth=1080,
+    )
+
+    resp = requests.post(url=api, json=params, verify=False)
+    data = resp.json()
+    dataset = data['ChartDataSets'][0]["data"]
+    latest_doses = dataset[len(dataset)-1]
+
+    d = date.today().strftime("%Y-%m-%d")
+    entry = d+","+latest_doses
+    print(entry)
+    conf = input("Do you want to add this entry (y/n)? ")
+    if conf == "y":
+        f = open("data.csv", "a")
+        f.write(entry+"\n")
+        f.close()
+        gen_img()
+
+
+def main():
+    if len(sys.argv) == 1:
+        print("usage: ./awhiy <OPTION>\n")
+        print("OPTIONS:")
+        print("\tgen: generate a new graph image (SVG)")
+        print("\tpull: pull latest vaccine doses entry from NCEMA")
+    if sys.argv[1] == "gen":
+        gen_img()
+    elif sys.argv[1] == "pull":
+        pull_data()
+
+
+if __name__ == "__main__":
+    main()
