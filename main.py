@@ -3,8 +3,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import sys
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import requests
+from quik import FileLoader
 
 # Doses goal for calculations
 DOSES_GOAL = 140
@@ -21,8 +22,23 @@ def get_herd_immunity():
     x0 = (model - DOSES_GOAL).roots
     return (model, mdates.num2date(x0[0]))
 
+def gen_html(estimate):
+    print("Rendering HTML")
+    loader = FileLoader('.')
+    template = loader.load_template('template.html')
+    estimate_txt = estimate.strftime("%d %B")
+    res = template.render({'estimate': estimate_txt,
+        'goalMs': estimate.timestamp(),
+        'today': date.today().strftime("%d %B"),
+        'ver': round(datetime.now().timestamp())},
+                  loader=loader).encode('utf-8')
+    f = open("index.html", "w")
+    f.write(res.decode("utf-8"))
+    f.close()
+
 
 def gen_img():
+    print("Generating image")
     model, estimate = get_herd_immunity()
     estimate_txt = estimate.strftime("%d %b")
 
@@ -65,6 +81,7 @@ def gen_img():
     plt.savefig('chart.svg')
 
     print("We will reach herd immunity at: " + estimate_txt)
+    gen_html(estimate)
 
 
 def pull_data():

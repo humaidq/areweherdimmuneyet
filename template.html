@@ -45,8 +45,10 @@ img {
   <h2 class="answer">No</h2>
   <p>At the current rate, we estimate that we will reach herd
   immunity by</p>
-  <p class="date">30<sup>th</sup> March</p>
-  <img src="chart.svg?v=26" />
+  <p class="date">@estimate</p>
+  <p id="est"><noscript><small>Enable JavaScript to show estimate
+      countdown! Code is released under BSD-2.</small></noscript></p>
+  <img src="chart.svg?v=@ver" />
   <p><small>We have chosen 140 doses per 100 people (~70%) as the goal for herd
     immunity, which is not based on scientific research. This estimate is
     predicted using polynomial regression, expect it to change frequently.
@@ -54,6 +56,13 @@ img {
         goal</b>.<br>
   This is a hobbyist website, which is unaffiliated with any authority or
   official body.</small></p>
-  <p><small>Last updated: 12 February</small></p>
+  <p><small>Last updated: @today</small></p>
   <p><small><a href="https://git.sr.ht/~humaid/areweherdimmuneyet"
-    target="src">Source</a></small></p>
+               target="src">Source</a></small></p>
+  <script>
+const date1 = @goalMs;
+const ONE = 1000 * 60 * 60 * 24; // millis * seconds * minutes * hours
+const diff = Math.abs(date1 - (new Date()).getMilliseconds());
+est = Math.floor(diff/ONE);
+document.getElementById("est").innerHTML = "(in "+est+" days)";
+  </script>
