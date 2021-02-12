@@ -22,18 +22,20 @@ def get_herd_immunity():
     x0 = (model - DOSES_GOAL).roots
     return (model, mdates.num2date(x0[0]))
 
+
 def gen_html(estimate):
     print("Rendering HTML")
     loader = FileLoader('.')
     template = loader.load_template('template.html')
     estimate_txt = estimate.strftime("%d %B")
-    res = template.render({'estimate': estimate_txt,
-        'goalMs': round(estimate.timestamp()),
-        'today': date.today().strftime("%d %B"),
-        'ver': round(datetime.now().timestamp()),
-        'goal': DOSES_GOAL,
-        'perc': int((DOSES_GOAL/200)*100)},
-                  loader=loader).encode('utf-8')
+    res = template.render(
+        {'estimate': estimate_txt,
+         'goalMs': round(estimate.timestamp()),
+         'today': date.today().strftime("%d %B"),
+         'ver': round(datetime.now().timestamp()),
+         'goal': DOSES_GOAL,
+         'perc': int((DOSES_GOAL/200)*100)},
+        loader=loader).encode('utf-8')
     f = open("index.html", "w")
     f.write(res.decode("utf-8"))
     f.close()
@@ -48,7 +50,6 @@ def gen_img():
     until = estimate + timedelta(days=3)
     myline = np.linspace(mdates.date2num(dataset.Date[0]),
                          mdates.date2num(until))
-
 
     fig, ax = plt.subplots()
 
@@ -65,19 +66,20 @@ def gen_img():
     ax.grid(True)
     ax.grid(b=True, which="minor")
 
-    plt.plot(dataset.Date, y, label="Inoculations per 100 people", color="tab:green")
+    plt.plot(dataset.Date, y, label="Inoculations per 100 people",
+             color="tab:green")
     plt.plot(myline, model(myline), label="Estimate (polynomial regression)",
              linestyle=":", color="tab:orange")
-    plt.plot(mdates.date2num(estimate), DOSES_GOAL, 'g*', label="Estimated Goal (140 doses)")
+    plt.plot(mdates.date2num(estimate), DOSES_GOAL, 'g*',
+             label="Estimated Goal (140 doses)")
     plt.text(mdates.date2num(estimate)-15, DOSES_GOAL-2, "("+estimate_txt+")")
     plt.ylabel('Doses')
     plt.xlabel('Date')
     plt.title('COVID-19 Vaccine Doses per 100')
     plt.legend()
 
-
     # horizontal line
-    #plt.axhline(y=DOSES_GOAL, color='r', linestyle=':')
+    # plt.axhline(y=DOSES_GOAL, color='r', linestyle=':')
 
     ax.tick_params(axis='x', which='both', labelsize=5)
     plt.savefig('chart.svg')
