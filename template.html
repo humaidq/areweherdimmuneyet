@@ -61,8 +61,9 @@ img {
                target="src">Source</a></small></p>
   <script>
 const date1 = @goalMs;
-const ONE = 1000 * 60 * 60 * 24; // millis * seconds * minutes * hours
-const diff = Math.abs(date1 - (new Date()).getMilliseconds());
+const ONE = 60 * 60 * 24; // seconds * minutes * hours
+const today = new Date().getTime() / 1000;
+const diff = Math.abs(date1 - today);
 est = Math.floor(diff/ONE);
 document.getElementById("est").innerHTML = "(in "+est+" days)";
   </script>

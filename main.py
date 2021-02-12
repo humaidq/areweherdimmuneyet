@@ -28,7 +28,7 @@ def gen_html(estimate):
     template = loader.load_template('template.html')
     estimate_txt = estimate.strftime("%d %B")
     res = template.render({'estimate': estimate_txt,
-        'goalMs': estimate.timestamp(),
+        'goalMs': round(estimate.timestamp()),
         'today': date.today().strftime("%d %B"),
         'ver': round(datetime.now().timestamp())},
                   loader=loader).encode('utf-8')
