@@ -30,7 +30,9 @@ def gen_html(estimate):
     res = template.render({'estimate': estimate_txt,
         'goalMs': round(estimate.timestamp()),
         'today': date.today().strftime("%d %B"),
-        'ver': round(datetime.now().timestamp())},
+        'ver': round(datetime.now().timestamp()),
+        'goal': DOSES_GOAL,
+        'perc': int((DOSES_GOAL/200)*100)},
                   loader=loader).encode('utf-8')
     f = open("index.html", "w")
     f.write(res.decode("utf-8"))
