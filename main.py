@@ -24,15 +24,21 @@ def get_herd_immunity():
 
 def gen_img():
     model, estimate = get_herd_immunity()
+    estimate_txt = estimate.strftime("%d %b")
 
     # show graph up to:
     until = estimate + timedelta(days=3)
     myline = np.linspace(mdates.date2num(dataset.Date[0]),
                          mdates.date2num(until))
 
+
+    fig, ax = plt.subplots()
+
+    # set color to match page
+    fig.set_facecolor("#fafafa")
+
     dayloc = mdates.DayLocator()
     fdloc = mdates.DayLocator(interval=5)
-    fig, ax = plt.subplots()
     maj_fmt = mdates.DateFormatter('%-d %b')
     ax.xaxis.set_major_formatter(maj_fmt)
     ax.xaxis.set_major_locator(fdloc)
@@ -41,22 +47,24 @@ def gen_img():
     ax.grid(True)
     ax.grid(b=True, which="minor")
 
-    plt.plot(dataset.Date, y, label="Doses per 100", color="tab:green")
+    plt.plot(dataset.Date, y, label="Inoculations per 100 people", color="tab:green")
     plt.plot(myline, model(myline), label="Estimate (polynomial regression)",
              linestyle=":", color="tab:orange")
+    plt.plot(mdates.date2num(estimate), DOSES_GOAL, 'g*', label="Estimated Goal (140 doses)")
+    plt.text(mdates.date2num(estimate)-15, DOSES_GOAL-2, "("+estimate_txt+")")
     plt.ylabel('Doses')
     plt.xlabel('Date')
     plt.title('COVID-19 Vaccine Doses per 100')
     plt.legend()
 
+
     # horizontal line
-    plt.axhline(y=DOSES_GOAL, color='r', linestyle=':')
+    #plt.axhline(y=DOSES_GOAL, color='r', linestyle=':')
 
     ax.tick_params(axis='x', which='both', labelsize=5)
     plt.savefig('chart.svg')
 
-    print("We will reach herd immunity at: " +
-          estimate.strftime("%Y-%m-%d"))
+    print("We will reach herd immunity at: " + estimate_txt)
 
 
 def pull_data():
