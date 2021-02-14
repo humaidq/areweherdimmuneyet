@@ -49,13 +49,22 @@ img {
   <p id="est"><noscript><small>Enable JavaScript to show estimate
       countdown! Code is released under BSD-2.</small></noscript></p>
   <img src="chart.svg?v=@ver" />
-  <p><small>We have chosen @goal doses per 100 people (~@perc%) as the goal for herd
-    immunity, which is not based on scientific research. This estimate is
-    predicted using polynomial regression, expect it to change frequently.
-      Remember, this is <b>just an estimation</b> on an <b>arbitrary
-        goal</b>.<br>
-  This is a hobbyist website, which is unaffiliated with any authority or
-  official body.</small></p>
+  <h3>Explanation</h3>
+  <p><small>Assuming R<sub>0</sub> of COVID-19 is 3 when no precautions are
+    taken. We can calculate herd immunity threshold using the formula:
+    1-(1/R<sub>0</sub>). In this case it is 0.67 (67%).</small></p>
+
+  <p><small>Since the number of the people who took two doses are not provided,
+    and knowing each person has to take two doses. We chose 140 doses per 100
+    people (~70%) as the goal.</small></p>
+
+  <p><small>This estimate is predicted using polynomial regression, expect it
+    to change frequently.  Remember, this is <b>just an estimation</b> on an
+    <b>arbitrary goal</b>.</small></p>
+
+  <p><small>This is a hobbyist website, which is
+    unaffiliated with any authority or official body.</small></p>
+
   <p><small>Last updated: @today</small></p>
   <p><small><a href="https://git.sr.ht/~humaid/areweherdimmuneyet"
                target="src">Source</a></small></p>
