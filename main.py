@@ -20,7 +20,8 @@ y = dataset['Doses']
 def get_herd_immunity():
     model = np.poly1d(np.polyfit(x, y, 2))
     x0 = (model - DOSES_GOAL).roots
-    return (model, mdates.num2date(x0[0]))
+    #print(mdates.num2date(x0[0]), mdates.num2date(x[1]))
+    return (model, mdates.num2date(x0[1]))
 
 
 def gen_html(estimate):
