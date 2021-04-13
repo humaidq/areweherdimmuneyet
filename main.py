@@ -69,7 +69,7 @@ def gen_img():
 
     plt.plot(dataset.Date, y, label="Inoculations per 100 people",
              color="tab:green")
-    plt.plot(myline, model(myline), label="Estimate (polynomial regression)",
+    plt.plot(myline, model(myline), label="Estimate (linear regression)",
              linestyle=":", color="tab:orange")
     plt.plot(mdates.date2num(estimate), DOSES_GOAL, 'g*',
              label="Estimated Goal (140 doses)")
