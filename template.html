@@ -43,16 +43,16 @@ img {
   <p>UAE COVID-19 Herd Immunity</p>
   <h1 class="question">Are we herd-immune yet?</h1>
   <h2 class="answer">No</h2>
-  <p><b>We're half-way there!</b> At the current rate, we estimate that we will reach herd
-  immunity by</p>
+  <p><b>We're almost there!</b> At the current rate, we estimate that we will
+  reach herd immunity by</p>
   <p class="date">@estimate</p>
   <p id="est"><noscript><small>Enable JavaScript to show estimate
       countdown! Code is released under BSD-2.</small></noscript></p>
   <img src="chart.svg?v=@ver" />
   <h3>Explanation</h3>
-  <p><small>The goal of 120 doses per 100 person is based on Israel, as they
-    reached records low levels of COVID-19 cases at around 115-120
-    doses.</small></p>
+  <p><small>The goal of 120 doses per 100 person is based on Israel's real life
+    results, as they reached records low levels of COVID-19 cases at around
+    115-120 doses<sup><a href="#cite1">[1]</a></sup>.</small></p>
 
   <p><small>This estimate is predicted using linear regression, expect it
     to change frequently.  Remember, this is <b>just an estimation</b> on an
@@ -61,9 +61,16 @@ img {
   <p><small>This is a hobbyist website, which is
     unaffiliated with any authority or official body.</small></p>
 
+  <p><small>Data source: <a href="https://covid19.ncema.gov.ae/">UAE National
+      Emergency Crisis and Disasters Management Authority</a></small></p>
+  <p id="cite1"><small>[1]: <a
+      href="https://ourworldindata.org/coronavirus/country/israel">Israel
+      Coronavirus Profile on Our World in Data</a></p>
+
   <p><small>Last updated: @today</small></p>
   <p><small><a href="https://git.sr.ht/~humaid/areweherdimmuneyet"
-               target="src">Source</a></small></p>
+               target="src">Website Source Code</a> (released under BSD
+             2-Clause)</small></p>
   <script>
 const date1 = @goalMs;
 const ONE = 60 * 60 * 24; // seconds * minutes * hours
