@@ -8,7 +8,7 @@ import requests
 from quik import FileLoader
 
 # Doses goal for calculations
-DOSES_GOAL = 140
+DOSES_GOAL = 120
 
 dataset = pd.read_csv('data.csv')
 dataset['Date'] = pd.to_datetime(dataset['Date'])
@@ -20,7 +20,7 @@ y = dataset['Doses']
 def get_herd_immunity():
     model = np.poly1d(np.polyfit(x, y, 1))
     x0 = (model - DOSES_GOAL).roots
-    #print(mdates.num2date(x0[0]), mdates.num2date(x[1]))
+    # print(mdates.num2date(x0[0]), mdates.num2date(x[1]))
     return (model, mdates.num2date(x0[0]))
 
 
@@ -72,7 +72,7 @@ def gen_img():
     plt.plot(myline, model(myline), label="Estimate (linear regression)",
              linestyle=":", color="tab:orange")
     plt.plot(mdates.date2num(estimate), DOSES_GOAL, 'g*',
-             label="Estimated Goal (140 doses)")
+             label="Estimated Goal (120 doses)")
     plt.text(mdates.date2num(estimate)-15, DOSES_GOAL-2, "("+estimate_txt+")")
     plt.ylabel('Doses')
     plt.xlabel('Date')
