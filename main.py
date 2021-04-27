@@ -18,10 +18,10 @@ y = dataset['Doses']
 
 
 def get_herd_immunity():
-    model = np.poly1d(np.polyfit(x, y, 1))
+    model = np.poly1d(np.polyfit(x, y, 2))
     x0 = (model - DOSES_GOAL).roots
     # print(mdates.num2date(x0[0]), mdates.num2date(x[1]))
-    return (model, mdates.num2date(x0[0]))
+    return (model, mdates.num2date(x0[1]))
 
 
 def gen_html(estimate):
@@ -69,7 +69,7 @@ def gen_img():
 
     plt.plot(dataset.Date, y, label="Inoculations per 100 people",
              color="tab:green")
-    plt.plot(myline, model(myline), label="Estimate (linear regression)",
+    plt.plot(myline, model(myline), label="Estimate (polynomial regression)",
              linestyle=":", color="tab:orange")
     plt.plot(mdates.date2num(estimate), DOSES_GOAL, 'g*',
              label="Estimated Goal (120 doses)")
