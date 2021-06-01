@@ -8,7 +8,9 @@ import requests
 from quik import FileLoader
 
 # Doses goal for calculations
-DOSES_GOAL = 120
+EFFICACY = 0.86
+DOSES_GOAL = 120 + ((1-EFFICACY)*200)
+print(DOSES_GOAL)
 
 dataset = pd.read_csv('data.csv')
 dataset['Date'] = pd.to_datetime(dataset['Date'])
