@@ -3,26 +3,37 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import sys
+import math
 from datetime import date, timedelta, datetime
 import requests
 from quik import FileLoader
 
 # Doses goal for calculations
-EFFICACY = 0.86
-DOSES_GOAL = 120 + ((1-EFFICACY)*200)
-print(DOSES_GOAL)
+UAE_POP = 9890620
+R0 = 6.5
+GOAL = (1 - (1/R0))*100
+print("goal", GOAL)
 
-dataset = pd.read_csv('data.csv')
+owid = pd.read_csv('data.csv')
+
+dat = [ ] 
+
+for index, row in owid.iterrows():
+    fully = row['people_fully_vaccinated']
+    if not math.isnan(fully):
+        dat.append([row['date'], (fully/UAE_POP)*100])
+
+dataset = pd.DataFrame(dat, columns=['Date', 'Percentage'])
 dataset['Date'] = pd.to_datetime(dataset['Date'])
 
 x = mdates.date2num(pd.Index(dataset.Date).to_pydatetime())
-y = dataset['Doses']
+y = dataset['Percentage']
 
 
 def get_herd_immunity():
     model = np.poly1d(np.polyfit(x, y, 2))
-    x0 = (model - DOSES_GOAL).roots
-    # print(mdates.num2date(x0[0]), mdates.num2date(x[1]))
+    x0 = (model - GOAL).roots
+    #print(mdates.num2date(x0[0]), mdates.num2date(x[1]))
     return (model, mdates.num2date(x0[1]))
 
 
@@ -36,8 +47,7 @@ def gen_html(estimate):
          'goalMs': round(estimate.timestamp()),
          'today': date.today().strftime("%d %B"),
          'ver': round(datetime.now().timestamp()),
-         'goal': DOSES_GOAL,
-         'perc': int((DOSES_GOAL/200)*100)},
+         'goal': int(GOAL)},
         loader=loader).encode('utf-8')
     f = open("index.html", "w")
     f.write(res.decode("utf-8"))
@@ -60,7 +70,7 @@ def gen_img():
     fig.set_facecolor("#fafafa")
 
     dayloc = mdates.DayLocator()
-    fdloc = mdates.DayLocator(interval=5)
+    fdloc = mdates.DayLocator(interval=15)
     maj_fmt = mdates.DateFormatter('%-d %b')
     ax.xaxis.set_major_formatter(maj_fmt)
     ax.xaxis.set_major_locator(fdloc)
@@ -69,20 +79,17 @@ def gen_img():
     ax.grid(True)
     ax.grid(b=True, which="minor")
 
-    plt.plot(dataset.Date, y, label="Inoculations per 100 people",
+    plt.plot(dataset.Date, y, label="People fully vaccinated",
              color="tab:green")
     plt.plot(myline, model(myline), label="Estimate (polynomial regression)",
              linestyle=":", color="tab:orange")
-    plt.plot(mdates.date2num(estimate), DOSES_GOAL, 'g*',
-             label="Estimated Goal (120 doses)")
-    plt.text(mdates.date2num(estimate)-15, DOSES_GOAL-2, "("+estimate_txt+")")
-    plt.ylabel('Doses')
+    plt.plot(mdates.date2num(estimate), GOAL, 'g*',
+            label="Estimated Goal ("+str(int(GOAL))+"%)")
+    plt.text(mdates.date2num(estimate)-15, GOAL-2, "("+estimate_txt+")")
+    plt.ylabel('Percentage')
     plt.xlabel('Date')
-    plt.title('COVID-19 Vaccine Doses per 100')
+    plt.title('People Fully Vaccinated')
     plt.legend()
-
-    # horizontal line
-    # plt.axhline(y=DOSES_GOAL, color='r', linestyle=':')
 
     ax.tick_params(axis='x', which='both', labelsize=5)
     plt.savefig('chart.svg')
@@ -90,43 +97,5 @@ def gen_img():
     print("We will reach herd immunity at: " + estimate_txt)
     gen_html(estimate)
 
-
-def pull_data():
-    api = "http://covid19.ncema.gov.ae/ar/Home/InitializeDosesLineChart"
-    params = dict(
-            Year=0,
-            Month=0,
-            Type="LatestTenDays",
-            screenWidth=1080,
-    )
-
-    resp = requests.post(url=api, json=params, verify=False)
-    data = resp.json()
-    dataset = data['ChartDataSets'][0]["data"]
-    latest_doses = dataset[len(dataset)-1]
-
-    d = date.today().strftime("%Y-%m-%d")
-    entry = d+","+latest_doses
-    print(entry)
-    conf = input("Do you want to add this entry (y/n)? ")
-    if conf == "y":
-        f = open("data.csv", "a")
-        f.write(entry+"\n")
-        f.close()
-        gen_img()
-
-
-def main():
-    if len(sys.argv) == 1:
-        print("usage: ./awhiy <OPTION>\n")
-        print("OPTIONS:")
-        print("\tgen: generate a new graph image (SVG)")
-        print("\tpull: pull latest vaccine doses entry from NCEMA")
-    if sys.argv[1] == "gen":
-        gen_img()
-    elif sys.argv[1] == "pull":
-        pull_data()
-
-
 if __name__ == "__main__":
-    main()
+    gen_img()
